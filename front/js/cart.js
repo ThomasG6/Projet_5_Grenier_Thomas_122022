@@ -112,28 +112,100 @@ for (const itemId in cart) {
         cartDom.appendChild(article);
 
         //modification de la quantité du produit
-    input.addEventListener("change", (event) => {
-        const newQuantity = Number(event.target.value); // this.value
-        if (newQuantity > 0 && newQuantity <= 100) {
-          update(itemId, newQuantity, responseBody.price);
-          price.textContent = responseBody.price * newQuantity + " €";
-          return true;
-        } else {
-          alert("Veuillez rentrer une quantité comprise entre 0 et 100");
-          return false;
-        }
-      });
+        input.addEventListener("change", (event) => {
+            const newQuantity = Number(event.target.value); // this.value
+            if (newQuantity > 0 && newQuantity <= 100) {
+                update(itemId, newQuantity, responseBody.price);
+                price.textContent = responseBody.price * newQuantity + " €";
+                return true;
+            } else {
+                alert("Veuillez rentrer une quantité comprise entre 0 et 100");
+                return false;
+            }
+        });
   
-      //sélection des références de tous les deleteItem
-      deleteItem.addEventListener("click", () => {
-        const itemToDelete = deleteItem.closest(".cart__item");
-        const idToDelete = itemToDelete.dataset.id + itemToDelete.dataset.color;
-        const newCart = getCart();
-        delete newCart[idToDelete];
-        localStorage.setItem('cart', JSON.stringify(newCart));
-        itemToDelete.remove();
-        alert("Cette article à bien été supprimée du panier");
-      });
+        //sélection des références de tous les deleteItem
+        deleteItem.addEventListener("click", () => {
+            const itemToDelete = deleteItem.closest(".cart__item");
+            const idToDelete = itemToDelete.dataset.id + itemToDelete.dataset.color;
+            const newCart = getCart();
+            delete newCart[idToDelete];
+            localStorage.setItem('cart', JSON.stringify(newCart));
+            itemToDelete.remove();
+            alert("Cette article à bien été supprimée du panier");
+        });
+
+        //Gestion du formulaire //
+
+        // Sélection du bouton de commande
+        const submitButton = document.querySelector(".cart__order__form__submit");
+
+        // On écoute les clicks du bouton de commande
+        submitButton.addEventListener("click", (event) => {
+            event.preventDefault();
+
+            // Récupération des valeures du formulaire
+            const contact = {
+                firstName: document.querySelector("#firstName").value,
+                lastName: document.querySelector("#lastName").value,
+                address: document.querySelector("#address").value,
+                city: document.querySelector("#city").value,
+                email: document.querySelector("#email").value
+            }
+
+            //on vérifier si le panier et vide
+            if (totalPrice <= 0) {
+                window.alert("Votre panier est vide");
+                return;
+            }
+        
+            //On besoin d'une fonction qui va valider un input, renvoyer le boolean qui va bien mais en bonus afficher le message d'erreur si nécessaire
+
+            const isInputValid = (inputElementID, regex, errorMessage) => {
+                //Il est aussi de bon ton de tester si l'input est vide 
+                const inputElement = document.querySelector(inputElementID);
+                const msgError = document.querySelector(inputElementID + "ErrorMsg");
+
+                //Si inputElement.value est vide
+                if (!inputElement.value) {
+                msgError.textContent = "Veuillez entrer " + errorMessage.toLowerCase();
+                return false;
+                }
+
+                //Si inputElement.value ne match pas la regex
+                if (!regex.test(inputElement.value)){
+                msgError.textContent = errorMessage + " est invalide";
+                return false;
+                }
+
+                //Tout va bien, on efface le message d'erreur
+                msgError.textContent = "";
+                return true;
+            }
+            
+            const nameRegex = /^([a-zA-Zàâäéèêëïîôöùûüç']{3,20})?([-]{0,1})?([a-zA-Zàâäéèêëïîôöùûüç']{3,20})$/;
+            const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w]{2,}$/;
+            const addressRegex = /^([0-9]{0,3}(([,. ]?){0,1}[a-zA-Zàâäéèêëïîôöùûüç' ]+))$/;
+            let isFormValid = true;
+
+            //on vérifier que tout les champs du formulaire est bien remplit
+            isFormValid = isInputValid('#firstName', nameRegex, 'Votre prénom') && isFormValid;
+            isFormValid = isInputValid('#lastName', nameRegex, 'Votre nom') && isFormValid;
+            isFormValid = isInputValid('#address', addressRegex, 'Votre adresse') && isFormValid;
+            isFormValid = isInputValid('#city', nameRegex, 'Votre ville') && isFormValid;
+            isFormValid = isInputValid('#email', emailRegex, 'Votre email') && isFormValid;
+        
+            if (!isFormValid) {
+                return;
+            }
+
+            const cart = getCart();
+
+            const order = {
+                contact,
+                products: Object.values(cart).map((item) => item.id),
+            };
+        });
     })
 
     .catch(error => {
@@ -141,5 +213,3 @@ for (const itemId in cart) {
     });
   
 }
-
-
