@@ -33,11 +33,11 @@ for (const itemId in cart) {
   fetch("http://localhost:3000/api/products/" + kanap.id)
     .then(response => {
         if (response.ok) {
-        return response.json();
+            return response.json();
         }
 
         if (response.status === 404) {
-        throw new Error("La page n'a pas été trouvé");
+            throw new Error("La page n'a pas été trouvé");
         }
 
         throw new Error('Serveur injoignable');
@@ -123,7 +123,7 @@ for (const itemId in cart) {
                 return false;
             }
         });
-  
+
         //sélection des références de tous les deleteItem
         deleteItem.addEventListener("click", () => {
             const itemToDelete = deleteItem.closest(".cart__item");
@@ -168,16 +168,15 @@ for (const itemId in cart) {
 
                 //Si inputElement.value est vide
                 if (!inputElement.value) {
-                msgError.textContent = "Veuillez entrer " + errorMessage.toLowerCase();
-                return false;
+                    msgError.textContent = "Veuillez entrer " + errorMessage.toLowerCase();
+                    return false;
                 }
 
                 //Si inputElement.value ne match pas la regex
                 if (!regex.test(inputElement.value)){
-                msgError.textContent = errorMessage + " est invalide";
-                return false;
+                    msgError.textContent = errorMessage + " est invalide";
+                    return false;
                 }
-
                 //Tout va bien, on efface le message d'erreur
                 msgError.textContent = "";
                 return true;
@@ -205,11 +204,36 @@ for (const itemId in cart) {
                 contact,
                 products: Object.values(cart).map((item) => item.id),
             };
+
+            // POST pour récupérer orderId
+            fetch("http://localhost:3000/api/products/order", {
+                method: "POST",
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(order),
+            })
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                })
+                .then((response) => {
+                    const { orderId } = response;
+                    window.location.href = `confirmation.html?orderId=${orderId}`;
+                })
+                .catch((error) => {
+                    alert(error.message);
+                })
+
+            localStorage.removeItem("cart");
         });
     })
-
     .catch(error => {
         alert(error.message);
     });
-  
+    
 }
+
+
