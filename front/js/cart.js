@@ -3,6 +3,29 @@ const cartDom = document.querySelector('#cart__items');
 const priceItems = document.querySelector("#totalPrice");
 const quantityItems = document.querySelector("#totalQuantity");
 
+//initialisation
+priceItems.textContent = 0;
+quantityItems.textContent = 0;
+
+function update(id, newQuantity, price) {
+  // Update item
+  const newCart = getCart();
+  newCart[id].quantity = newQuantity;
+  localStorage.setItem('cart', JSON.stringify(newCart));
+
+  // Update total values
+  let newTotalPrice = 0;
+  let newTotalQuantity = 0;
+
+  for (const idItem in newCart) {
+    newTotalQuantity += newCart[idItem].quantity;
+    newTotalPrice += price * newCart[idItem].quantity;
+  }
+
+  quantityItems.textContent = newTotalQuantity;
+  priceItems.textContent = newTotalPrice;
+}
+
 for (const itemId in cart) {
 
   const kanap = cart[itemId];
@@ -69,6 +92,9 @@ for (const itemId in cart) {
         deleteItem.classList.add("deleteItem");
         deleteItem.textContent = "Supprimer";
 
+        priceItems.textContent = Number(priceItems.textContent) + responseBody.price * kanap.quantity;
+        quantityItems.textContent = Number(quantityItems.textContent) + kanap.quantity;
+
         //affichage des élements 
         itemContentSettingsDelete.appendChild(deleteItem);
         itemContentSettingsQuantity.appendChild(quantity);
@@ -84,6 +110,30 @@ for (const itemId in cart) {
         article.appendChild(itemImg);
         article.appendChild(itemContent);
         cartDom.appendChild(article);
+
+        //modification de la quantité du produit
+    input.addEventListener("change", (event) => {
+        const newQuantity = Number(event.target.value); // this.value
+        if (newQuantity > 0 && newQuantity <= 100) {
+          update(itemId, newQuantity, responseBody.price);
+          price.textContent = responseBody.price * newQuantity + " €";
+          return true;
+        } else {
+          alert("Veuillez rentrer une quantité comprise entre 0 et 100");
+          return false;
+        }
+      });
+  
+      //sélection des références de tous les deleteItem
+      deleteItem.addEventListener("click", () => {
+        const itemToDelete = deleteItem.closest(".cart__item");
+        const idToDelete = itemToDelete.dataset.id + itemToDelete.dataset.color;
+        const newCart = getCart();
+        delete newCart[idToDelete];
+        localStorage.setItem('cart', JSON.stringify(newCart));
+        itemToDelete.remove();
+        alert("Cette article à bien été supprimée du panier");
+      });
     })
 
     .catch(error => {
