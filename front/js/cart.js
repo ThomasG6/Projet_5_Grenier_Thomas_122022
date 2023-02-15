@@ -39,8 +39,6 @@ for (const itemId in cart) {
         if (response.status === 404) {
             throw new Error("La page n'a pas été trouvé");
         }
-
-        throw new Error('Serveur injoignable');
     })
     .then(responseBody => {
         // création des balises
@@ -231,7 +229,7 @@ for (const itemId in cart) {
         });
     })
     .catch(error => {
-        alert(error.message);
+        alert('Serveur injoignable');
     });
     
 }

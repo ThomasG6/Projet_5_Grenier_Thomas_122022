@@ -47,8 +47,6 @@ fetch("http://localhost:3000/api/products/" + productId)
             throw new Error("Le produit n'existe pas");
         }
 
-        //Sinon en déclanche une erreur
-        throw new Error('Serveur injoignable, veuillez réessayez ultérieurement');
     })
     .then(kanap => {
         //traitement des données de la reponse 
@@ -118,6 +116,6 @@ fetch("http://localhost:3000/api/products/" + productId)
         });
     })
     .catch(error => {
-        alert(error.message);
+        alert('Serveur injoignable, veuillez réessayez ultérieurement');
     });
 

@@ -12,9 +12,7 @@ fetch("http://localhost:3000/api/products")
         if (response.status === 404) {
             throw new Error("La page n'a pas été trouvé");
         }
-        
-        //Sinon en déclanche une erreur
-        throw new Error("Serveur injoignable, veuillez réessayez ultérieurement");
+    
     })
     .then(responseBody => {
         //traitement des données de la reponse 
@@ -46,5 +44,5 @@ fetch("http://localhost:3000/api/products")
     })
     .catch(error => {
         //traitement en cas d'erreur
-        alert(error.message);
+        alert("Serveur injoignable, veuillez réessayez ultérieurement");
     });
